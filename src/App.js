@@ -1,6 +1,10 @@
 import logo from './logo.svg';
 import './App.css';
 
+function giveNames() {
+  return "Tejul Oaan Dmitrii"
+}
+
 function App() {
   return (
     <div className="App">

@@ -5,7 +5,9 @@ import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import { AuthProvider } from './contexts/AuthContext';
 import Home from './components/home';
 import Signup from './components/signup';
-
+import PrivateRoute from './components/PrivateRoute';
+import CreateTree from './components/CreateTree';
+import Navbar from './components/Navbar';
 
 
 function App() {
@@ -16,8 +18,9 @@ function App() {
       <Router>
         <AuthProvider>
           <Switch>
-            <Route exact path ="/" component={Home}/>
+            <PrivateRoute exact path ="/" component={Home}/>
             <Route path= "/login" component={SignInOutContainer}/>
+            <PrivateRoute path = "/create-tree" component={CreateTree}/>
           </Switch>
         </AuthProvider>
       </Router>

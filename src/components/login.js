@@ -1,70 +1,67 @@
-import React from 'react';
-import { Grid,Paper, Avatar, TextField, Button, Typography,Link } from '@material-ui/core'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import { useHistory } from 'react-router-dom';
-import Home from "../components/home";
-import {render} from 'react-dom';
-import CustomizedDialogs from './dialog';
-import SignUp from './signup';
+import React, {useState, useRef} from 'react'
+import { Grid, Paper, Avatar, Typography, TextField, Button} from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert';
+import { Form } from "react-bootstrap"
+import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
+import { useAuth } from "../contexts/AuthContext";
+import {useHistory} from "react-router-dom";
 
 
-const Login=()=>{
+export default function Login() {
+    const paperStyle = { padding: 20, width: 300, margin: "0 auto" };
+    const headerStyle = { margin: 0 };
+    const avatarStyle = { backgroundColor: '#1bbd7e' };
+    const marginTop = { marginTop: 5 };
 
-    //CSS Styles
-    const paperStyle={padding :20, height:'70vh', width:280, margin:"20px auto"}
-    const avatarStyle={backgroundColor:'#1bbd7e'}
-    const btnstyle={margin:'8px 0'}
+    const emailRef = useRef();
+    const passwordRef = useRef();
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-
+    const { login } = useAuth();
     const history = useHistory();
-    const navigateTo = () => {
 
-        console.log("hey this should be working");
+    async function handleSubmit(event) {
+
+        event.preventDefault();
+
+        try {
+            setError("");
+            setLoading(true);
+            console.log("this is the email: "+ emailRef.current.value);
+            console.log("this is the password: "+ passwordRef.current.value);
+            await login(emailRef.current.value, passwordRef.current.value);
+            history.push("/");
+        }
+
+        catch { 
+            setError("failed to sign in")
+        }
+        setLoading(false);
     }
 
-    const routes = [
-        {
-            path: "/home",
-            component: Home
-        }
-    ]
-
-
-    return(
+    return (
         <Grid>
-            <Paper elevation={10} style={paperStyle}>
+            <Paper style={paperStyle}>
                 <Grid align='center'>
-                     <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
-                    <h2>Sign In</h2>
+                    <Avatar style={avatarStyle}>
+                        <AddCircleOutlineOutlinedIcon />
+                    </Avatar>
+                    <h2 style={headerStyle}>Log In</h2>
+                    {error && <Alert severity="error">{error}</Alert>}
                 </Grid>
-                <TextField label='Username' placeholder='Enter username' fullWidth required/>
-                <TextField label='Password' placeholder='Enter password' type='password' fullWidth required/>
-                <FormControlLabel
-                    control={
-                    <Checkbox
-                        name="checkedB"
-                        color="primary"
-                    />
-                    }
-                    label="Remember me"
-                 />
-                <Button onClick={navigateTo} type='submit' color='primary' style={btnstyle} fullWidth>Sign in</Button>
-                <Typography >
-                     <Link href="#" >
-                        Forgot password ?
-                </Link>
-                </Typography>
-                <Typography > Do you have an account?
-                    <CustomizedDialogs title="Sign Up">
-                        <SignUp></SignUp>
-                    </CustomizedDialogs>
-                     
-                </Typography>
+                <Form onSubmit={handleSubmit}>
+                    <Form.Group id="email">
+                        <Form.Label>Email</Form.Label>
+                        <Form.Control type="email" ref={emailRef} required />
+                    </Form.Group>
+                    <Form.Group id="password">
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control type="password" ref={passwordRef} required />
+                    </Form.Group>
+                    <Button onSubmit={handleSubmit} disabled={loading} type='submit' variant='contained' color='primary' style={marginTop}>Log In</Button>
+                </Form>
             </Paper>
         </Grid>
     )
 }
-
-export default Login;

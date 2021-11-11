@@ -1,19 +1,28 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
-import Login from './components/login';
+import SignInOutContainer from './containers';
+import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
+import { AuthProvider } from './contexts/AuthContext';
+import Home from './components/home';
+import Signup from './components/signup';
 
-function giveNames() {
-  return "Tejul Oaan Dmitrii"
-}
+
 
 function App() {
   return (
-    <div className="App">
 
-      <h1>Welcome to the My Ancestry Beta!</h1>
-      <Login></Login>
+    
+    <div className="App"> 
+      <Router>
+        <AuthProvider>
+          <Switch>
+            <Route exact path ="/" component={Home}/>
+            <Route path= "/login" component={SignInOutContainer}/>
+          </Switch>
+        </AuthProvider>
+      </Router>
     </div>
   );
-}
+} 
 
 export default App;

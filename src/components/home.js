@@ -1,11 +1,7 @@
-
-
 const Home = () => {
 
-
-
     return (
-        "hey this is oaan!"
+        <h1>"hey this is oaan!"</h1>
     )
 
 }

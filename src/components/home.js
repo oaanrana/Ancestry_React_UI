@@ -5,16 +5,19 @@ import { useAuth } from '../contexts/AuthContext';
 import {Link} from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
 import Navbar from './Navbar';
+import { Grid } from '@material-ui/core';
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { database } from 'src/firebase';
 
 export default function Home() {
-
-    const fitComponent = {
-        width: "20px"
-    }
 
     const [error, setError] = useState("");
     const {currentUser, logout} = useAuth();
     const history = useHistory();
+    const treesRef = collection(database, "FamilyTrees");
+
+    const [trees, setTrees] = useState([]);
+    
 
     async function handleLogout() {
         setError('');
@@ -26,8 +29,20 @@ export default function Home() {
         catch {
             setError("Failed to log out");
         }
-        
     }
+
+    useEffect( () => {
+        const q = query(treesRef, where("userId", "==", currentUser.email))
+        console.log(currentUser.email);
+        const getUsers = async () => {
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                console.log(doc.id, "=>", doc.data())
+            })
+            setTrees(querySnapshot.docs.map((doc)=> ({...doc.data(), id: doc.id})));
+          };
+        getUsers();
+    }, []);
 
     return (
         <> <Navbar/>
@@ -35,17 +50,23 @@ export default function Home() {
                 <h2 className="text-center mb-4">Profile</h2>
                 {error && <Alert severity="error">{error}</Alert>}
                 <strong>Email: </strong> {currentUser.email}
-                <Link to="/create-tree" className="btn btn-primary w-100 mt-3">Create a Family Tree</Link>
-            </Card.Body>
-        <div className="mx-auto">
-
-            <Button className="mx-auto"variant="link" onClick={handleLogout}>
+                <Button className="mx-auto" variant="link" onClick={handleLogout}>
                 Log Out
-            </Button>
-
-
-            </div>
+                </Button>
+                <Button >
+                    Go to Tree
+                </Button>
+            </Card.Body>
+        <Grid container>
+            {trees.map((tree) => {
+                return (
+                    <div>
+                        <h1>Family Tree Name: {tree.familyTreeName}</h1>
+                    </div>
+                )
+            })}
+            
+        </Grid>
         </>
     )
-
 }

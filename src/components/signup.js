@@ -21,6 +21,8 @@ export default function Signup() {
 
     const {signup, currentUser} = useAuth();
     const history = useHistory();
+
+
     async function handleSubmit(event) {
 
         event.preventDefault();
@@ -34,11 +36,7 @@ export default function Signup() {
         try {
             setError("");
             setLoading(true);
-            console.log("this is the email: "+ emailRef.current.value);
-            console.log("this is the password: "+ passwordRef.current.value);
             await signup(emailRef.current.value, passwordRef.current.value);
-            console.log("this is the email: "+ emailRef.current.value);
-            console.log("this is the password: "+ passwordRef.current.value);
             history.push("/");
         }
 

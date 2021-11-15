@@ -6,8 +6,9 @@ import { AuthProvider } from './contexts/AuthContext';
 import Home from './components/home';
 import Signup from './components/signup';
 import PrivateRoute from './components/PrivateRoute';
-import CreateTree from './components/CreateTree';
 import Navbar from './components/Navbar';
+import temp from './components/temp';
+import CreateTrees from "./components/CreateTrees";
 
 
 function App() {
@@ -20,7 +21,8 @@ function App() {
           <Switch>
             <PrivateRoute exact path ="/" component={Home}/>
             <Route path= "/login" component={SignInOutContainer}/>
-            <PrivateRoute path = "/create-tree" component={CreateTree}/>
+            <PrivateRoute path = "/create-tree" component={CreateTrees}/>
+            <PrivateRoute path ="/temp" component={temp}/>
           </Switch>
         </AuthProvider>
       </Router>

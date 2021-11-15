@@ -28,8 +28,6 @@ export default function Login() {
         try {
             setError("");
             setLoading(true);
-            console.log("this is the email: "+ emailRef.current.value);
-            console.log("this is the password: "+ passwordRef.current.value);
             await login(emailRef.current.value, passwordRef.current.value);
             history.push("/");
         }

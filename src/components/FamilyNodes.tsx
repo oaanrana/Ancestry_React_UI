@@ -27,8 +27,6 @@ export default React.memo<Props>(
   function FamilyNode({ node, isRoot, onSubClick, style}) {
 
     const [isOpenAdd, setIsOpenAdd] = useState(false);
-
-
     function openAddPerson(){
       setIsOpenAdd(true);
     }
@@ -37,7 +35,6 @@ export default React.memo<Props>(
       setIsOpenAdd(false);
     }
 
-    
     return (
       <div className={styles.root} style={style} title={node.id}>
         <PersonIcon className={classNames(
@@ -49,7 +46,7 @@ export default React.memo<Props>(
           onClick={openAddPerson}
           />
           <Dialog open={isOpenAdd} onClose={closeAddPerson}>
-            <DialogTitle>{node.id} </DialogTitle>
+            <DialogTitle>Name: {node.id} </DialogTitle>
           </Dialog>
       </div>
     );

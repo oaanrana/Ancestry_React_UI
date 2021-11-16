@@ -53,20 +53,20 @@ export default function Home() {
                 <Button className="mx-auto" variant="link" onClick={handleLogout}>
                 Log Out
                 </Button>
-                <Button >
-                    Go to Tree
-                </Button>
             </Card.Body>
         <Grid container>
             {trees.map((tree) => {
                 return (
-                    <div>
-                        <h1>Family Tree Name: {tree.familyTreeName}</h1>
-                    </div>
+                    <Link to="/create-tree">
+                        <h1>{tree.familyTreeName}</h1>
+                    </Link>
                 )
             })}
-            
-        </Grid>
+        </Grid>        
+        <Link variant="button" to="/create-tree">
+            If you don't have a tree, create a Family Tree now!
+        </Link>
+        
         </>
     )
 }

@@ -9,12 +9,12 @@ import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
 import temp from './components/temp';
 import CreateTrees from "./components/CreateTrees";
+import faq from './components/faq';
+import about from './components/about';
 
 
 function App() {
   return (
-
-    
     <div className="App"> 
       <Router>
         <AuthProvider>
@@ -23,6 +23,8 @@ function App() {
             <Route path= "/login" component={SignInOutContainer}/>
             <PrivateRoute path = "/create-tree" component={CreateTrees}/>
             <PrivateRoute path ="/temp" component={temp}/>
+            <PrivateRoute path="/faq" component={faq}/>
+            <PrivateRoute path="/about" component={about}/>
           </Switch>
         </AuthProvider>
       </Router>

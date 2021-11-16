@@ -5,7 +5,6 @@ import ReactFamilyTree from 'react-family-tree';
 import { Node, ExtNode, Gender, Relation, RelType } from 'relatives-tree/lib/types';
 import Navbar from './Navbar';
 import FamilyNodes from './FamilyNodes';
-import averageTree from 'relatives-tree/samples/average-tree.json';
 import styles from './Tree.module.css';
 import { render } from '@testing-library/react';
 import classNames from 'classnames';
@@ -15,37 +14,51 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import {database} from "../firebase";
-import {collection, query, where, getDocs, addDoc, updateDoc, deleteDoc} from "firebase/firestore";
+import {database} from "src/firebase";
+import { collection, addDoc, query, setDoc, updateDoc, deleteDoc, getDocs, where, doc } from "firebase/firestore"; 
 import { useAuth } from '../contexts/AuthContext';
+import {useLocation} from 'react-router-dom';
+import Menu from '@mui/material/Menu';
+import AppBar from '@mui/material/AppBar';
+import { Card, CardContent, Typography } from '@material-ui/core';
 
 
 type Source = Array<Node>;
 
 let family_tree_array: Source = [];
 
-export default function CreateTree(title: string) {
+export default function CreateTree() {
 
     const {currentUser, logout} = useAuth();
     const history = useHistory();
-    const [nodes, setNodes] = useState<Source>(family_tree_array);
-    const [rootId, setRootId] = useState();
-    const [myId, setmMyId] = useState();
+    const [nodes, setNodes] = useState<Source>([]);
+    const [rootId, setRootId] = useState("");
+    const [myId, setmMyId] = useState("");
+
+    const location = useLocation();
+    const treeTitle = location.state as JSON;
     const [treeName, setTreeName] = useState("");
     const [openName, setOpenName] = useState(false);
-    const treesRef = collection(database, "FamilyTrees");
 
+    const treesRef = collection(database, "FamilyTrees");
+    const [loadData, shouldLoadData] = useState(false);
+ 
     const [name, setName] = useState("");
     const [gender, setGender] = useState("");
     const [siblings, setSiblings] = useState("");
     const [parents, setParents] = useState("");
     const [children, setChildren] = useState("");
     const [spouse, setSpouse] = useState("");
-    const usersCollectionRef = collection(database, "users");
     
     const [isOpenAdd, setIsOpenAdd] = useState(false);
     const WIDTH = 70;
     const HEIGHT = 80;
+
+    const menu = {
+        float: "left",
+        position:"fixed",
+        top:"15px",
+    }
 
     async function handleGoHome() {
         history.push("/");
@@ -60,9 +73,26 @@ export default function CreateTree(title: string) {
       setOpenName(false);
     }
 
-    function handleNameChange() {
+    /**
+     * We need to go into the database and change the name of the ID
+     */
+    const handleNameChange = async() => {
+      const newField = {"FamilyTreeObject": family_tree_array, "familyTreeName": treeName, "userId": currentUser.email};
+      await setDoc(doc(database, "FamilyTrees", currentUser.email), newField);
       setOpenName(false);
     }
+
+    const resetTree = async() => {
+      family_tree_array = [];
+      setNodes(family_tree_array);
+      setRootId("");
+      setmMyId("");
+      setTreeName(" ");
+      shouldLoadData(true);
+      const newField = {"FamilyTreeObject": family_tree_array, "familyTreeName": "", "userId": currentUser.email};
+      await setDoc(doc(database, "FamilyTrees", currentUser.email), newField);
+      setOpenName(false);
+    } 
 
     function openAddPerson(){
       setIsOpenAdd(true);
@@ -230,37 +260,89 @@ export default function CreateTree(title: string) {
     }
 
     /**
-     * This function will be saving the tree and sending it to the firebase database
+     * This function will be saving the tree and sending it to firebase; UPDATE METHOD
      */
     const saveTree = async () => {
-      // const user = doc(database, "users", currentUser.email);
-      // await addDoc(usersCollectionRef, nodes);
+      const newField = {"FamilyTreeObject": family_tree_array, "familyTreeName": treeName, "userId": currentUser.email};
+      await setDoc(doc(database, "FamilyTrees", currentUser.email), newField);
+      shouldLoadData(!loadData);
     }
 
     useEffect( () => {
-      const q = query(treesRef, where("userId", "==", currentUser.email), where("familyTreeName", "==", title));
+      const q = query(treesRef, where("userId", "==", currentUser.email));
+
+      const loadTreeName = async () => {
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          setTreeName(doc.data().familyTreeName)
+      })}
+
       const loadTree = async () => {
         const querySnapshot = await getDocs(q);
-        console.log(querySnapshot.docs.at(0));
+        console.log(querySnapshot);
+        querySnapshot.forEach((doc) => {
+          let array = doc.data();
+          if (array.FamilyTreeObject === null || array.FamilyTreeObject === []) {
+            return;
+          }
+          family_tree_array = array.FamilyTreeObject;
+          //TODO: goal here is to setNodes to family_tree_array
+          console.log(family_tree_array);
+          if (family_tree_array.length > 0) {
+            setNodes([]);
+            setRootId(family_tree_array[0].id);
+            setmMyId(family_tree_array[0].id);
+            setNodes(family_tree_array);
+          }
+        });
       }
-      loadTree();
+
+      loadTreeName();
+      if (!loadData) {
+        loadTree();
+        shouldLoadData(true);
+      }
     }, [nodes, family_tree_array])
 
     return (
         <div className={classNames(styles.root)}>
           <Navbar/>
-
           {treeName && <h2>{treeName}</h2>}
-            <Button onClick={handleGoHome}>
-                    Go Back to home
-            </Button>
-            <Button onClick={openAddPerson}>
-                    Add Person
-            </Button>
-            <Button onClick={saveTree}>
-              Save Tree
-            </Button>
-            <Button onClick={openNameEditor}> Name your family tree </Button>
+          <Button onClick={handleGoHome}>
+                  Go Back to home
+          </Button>
+          <Button onClick={openAddPerson}>
+                  Add Person
+          </Button>
+          <Button onClick={openAddPerson}>
+                  Delete Person
+          </Button>
+          <Button onClick={resetTree}>
+                  Reset Tree
+          </Button>
+          <Button onClick={saveTree}>
+            Save Tree
+          </Button>
+          <Button onClick={openNameEditor}> Name your family tree </Button>
+          <Card>
+            <CardContent>
+              <Typography variant="h5" component="div">
+                Rules of Making a Tree
+              </Typography>
+              <Typography>
+                Rule 1: Please only add relations if they currently exist on the tree.
+              </Typography>
+              <Typography>
+                Rule 2: Please do not add duplicate names. If there are duplicate names in your family, modify the names so they are unique. (Ex: Allen S. and Allen J.)
+              </Typography>
+              <Typography>
+                Rule 3: Your first node should be as far up in your family tree. Any generations above it may not have siblings; only spouses, parents, and children.
+              </Typography>
+              <Typography>
+                Rule 4: Before you add a sibling, please make sure at least shared parent is added first. (Ex: Create Person, Create Person's Parent, then Create Person's siblings)
+              </Typography>
+            </CardContent>
+          </Card>
           <Dialog open={openName} onClose={closeNameEditor}>
             <DialogContent>
                 <TextField
@@ -363,7 +445,9 @@ export default function CreateTree(title: string) {
             </DialogActions>
           </Dialog>
 
+
           <div className={styles.wrapper}>
+            {nodes.length > 0 &&
             <ReactFamilyTree
               nodes={nodes as Node[]}
               rootId={rootId}
@@ -380,14 +464,13 @@ export default function CreateTree(title: string) {
                     width: WIDTH,
                     height: HEIGHT,
                     transform: `translate(${node.left * (WIDTH / 2)}px, ${node.top * (HEIGHT / 2)}px)`,
-                    // float:"left",
-                    left: `${317}px`,
+                    left: `${70}px`,
                     top: `${20}px`
                   }}
                 />
               )}
-            />
+            />}
           </div>
         </div>
     )
-}
+};

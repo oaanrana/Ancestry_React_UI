@@ -305,13 +305,13 @@ export default function CreateTree() {
     }, [nodes, family_tree_array])
 
     return (
-        <div className={classNames(styles.root)}>
+        <div data-testid="CreateTreesTest"className={classNames(styles.root)}>
           <Navbar/>
           {treeName && <h2>{treeName}</h2>}
-          <Button onClick={handleGoHome}>
+          <Button data-testid="goHome" onClick={handleGoHome}>
                   Go Back to home
           </Button>
-          <Button onClick={openAddPerson}>
+          <Button data-testid="add_person" onClick={openAddPerson}>
                   Add Person
           </Button>
           <Button onClick={openAddPerson}>
@@ -323,7 +323,7 @@ export default function CreateTree() {
           <Button onClick={saveTree}>
             Save Tree
           </Button>
-          <Button onClick={openNameEditor}> Name your family tree </Button>
+          <Button data-testid="openName"onClick={openNameEditor}> Name your family tree </Button>
           <Card>
             <CardContent>
               <Typography variant="h5" component="div">
@@ -343,7 +343,7 @@ export default function CreateTree() {
               </Typography>
             </CardContent>
           </Card>
-          <Dialog open={openName} onClose={closeNameEditor}>
+          <Dialog data-testid="openNameTest"open={openName} onClose={closeNameEditor}>
             <DialogContent>
                 <TextField
                 onChange = {(e) => setTreeName(e.target.value)}
@@ -363,7 +363,7 @@ export default function CreateTree() {
               >Submit </Button>
             </DialogActions>
             </Dialog>
-          <Dialog open={isOpenAdd} onClose={closeAddPerson} onSubmit={handleSubmit}> 
+          <Dialog data-testid="add_person_form" open={isOpenAdd} onClose={closeAddPerson} onSubmit={handleSubmit}> 
             <DialogTitle>Add Person to Family Tree </DialogTitle>
             <DialogContent>
                 <DialogContentText fontStyle="bold">

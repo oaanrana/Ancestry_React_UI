@@ -39,7 +39,7 @@ export default function Login() {
     }
 
     return (
-        <Grid>
+        <Grid data-testid="login">
             <Paper style={paperStyle}>
                 <Grid align='center'>
                     <Avatar style={avatarStyle}>
@@ -57,7 +57,9 @@ export default function Login() {
                         <Form.Label>Password</Form.Label>
                         <Form.Control type="password" ref={passwordRef} required />
                     </Form.Group>
-                    <Button onSubmit={handleSubmit} disabled={loading} type='submit' variant='contained' color='primary' style={marginTop}>Log In</Button>
+                    <Button 
+                    data-testid="LoginButton"
+                    onSubmit={handleSubmit} disabled={loading} type='submit' variant='contained' color='primary' style={marginTop}>Log In</Button>
                 </Form>
             </Paper>
         </Grid>

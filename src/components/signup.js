@@ -49,7 +49,7 @@ export default function Signup() {
 
 
     return (
-        <Grid>
+        <Grid data-testid="signup">
             <Paper style={paperStyle}>
 
                 <Grid align='center'>

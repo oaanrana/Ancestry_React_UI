@@ -45,12 +45,13 @@ export default function Home() {
     }, []);
 
     return (
-        <> <Navbar/>
+        <div data-testid="homeTest"> 
+        <Navbar/>
             <Card.Body className="mx-auto">
                 <h2 className="text-center mb-4">Profile</h2>
                 {error && <Alert severity="error">{error}</Alert>}
                 <strong>Email: </strong> {currentUser.email}
-                <Button className="mx-auto" variant="link" onClick={handleLogout}>
+                <Button data-testid="logoutTest" className="mx-auto" variant="link" onClick={handleLogout}>
                 Log Out
                 </Button>
             </Card.Body>
@@ -63,10 +64,10 @@ export default function Home() {
                 )
             })}
         </Grid>        
-        <Link variant="button" to="/create-tree">
+        <Link variant="button" to="/create-tree" data-testid="create_tree_button">
             If you don't have a tree, create a Family Tree now!
         </Link>
         
-        </>
+        </div>
     )
 }

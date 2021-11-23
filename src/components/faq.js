@@ -4,7 +4,7 @@ import Navbar from './Navbar'
 export default function faq() {
 
     return (
-        <div>
+        <div data-testid="faq_test">
             <Navbar/>
                 <head>
                     <title>FAQ</title>
